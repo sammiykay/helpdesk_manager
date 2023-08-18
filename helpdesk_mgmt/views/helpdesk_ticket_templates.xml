@@ -1,0 +1,877 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="portal_layout" name="Portal layout: ticket menu entry" inherit_id="portal.portal_breadcrumbs"
+        priority="40">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'ticket' or ticket"
+                t-attf-class="breadcrumb-item #{'active ' if not ticket else ''}">
+                <a t-if="ticket" t-attf-href="/my/tickets?{{ keep_query() }}">Tickets</a>
+                <t t-else="">Tickets</t>
+            </li>
+            <li t-if="ticket" class="breadcrumb-item active text-truncate">
+                <span t-field="ticket.name" />
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home" name="Portal My Home : ticket entries" inherit_id="portal.portal_my_home"
+        priority="40" customize_show="True">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Tickets</t>
+                <t t-set="url" t-value="'/my/tickets'" />
+                <t t-set="placeholder_count" t-value="'ticket_count'" />
+            </t>
+            <form method="POST" t-attf-action="/new/ticket">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <button name="create_new_ticket" type="action" class="btn btn-primary"
+                    style="float: right; margin-right: 0px; margin-bottom: 5px;">New Ticket</button>
+            </form>
+        </xpath>
+    </template>
+
+    <template id="portal_my_tickets" name="My Tickets">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/helpdesk_mgmt/static/src/css/mysheet.css" />
+        </xpath>
+        <title>My Tickets</title>
+        <div class="body">
+            <div class="nav">
+                <div class="border-g">
+                    <div class="main-wrapper navbar flexs">
+                        <div class="flexs">
+                            <div>
+                                <p class="logo"><span style="color: rgba(240,191,99,1);">HELP</span>DESK</p>
+                            </div>
+                            <div class="search_menu">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg>
+                                <input type="text" name="" id="" placeholder="Type here to search" />
+                            </div>
+                        </div>
+                        <div class="flexs">
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                                </svg>
+
+                            </div>
+                            <div>
+                                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                                </svg>
+                            </div>
+                            <div class="flexs">
+                                <!-- <svg style="width: 40px;" version="1.1" id="icons" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 64 64" style="enable-background:new 0 0 64 64" xml:space="preserve"><style>.st0{display:none}.st1{fill:#36d7b7}.st1,.st2,.st3{display:inline}.st2{fill:none;stroke:#414042;stroke-miterlimit:10}.st3{fill:#f5ab35}.st4{fill:#f7bc5d}.st4,.st5{display:inline}.st6{fill:#414042}.st7{fill:#36d7b7}.st10,.st9{display:inline;fill:#f1f2f2}.st10{fill:none;stroke:#414042;stroke-linecap:round;stroke-miterlimit:10}.st11,.st12{display:inline;fill:#414042}.st12{fill:#e6e7e8}.st14{fill:#d1d3d4}.st14,.st15{display:inline}.st15,.st16{fill:#fff}.st17{fill:#f5ab35}.st18{fill:#f9cd86}.st19{fill:none;stroke:#414042;stroke-miterlimit:10}.st20{fill:#29a189}.st21{fill:#f7bc5d}.st22{display:inline;fill:#29a189}.st23{fill:none;stroke:#414042;stroke-linecap:round;stroke-miterlimit:10}.st24{fill:#e6e7e8}.st27{fill:#5edfc5}.st28,.st29{fill:none;stroke-miterlimit:10}.st28{display:inline;stroke:#414042;stroke-dasharray:1}.st29{stroke:#36d7b7}.st32{display:inline;fill:#bcbec0}.st33{fill:none;stroke:#f5ab35;stroke-miterlimit:10}.st33,.st34,.st35{display:inline}.st34{fill:none;stroke:#36d7b7;stroke-miterlimit:10}.st35{fill:#5edfc5}.st38{fill:none;stroke:#fff;stroke-miterlimit:10}.st39,.st42{display:inline}.st39{fill:none;stroke:#fff;stroke-miterlimit:10}.st42{fill:#86e7d4}</style><g id="XMLID_175_"><path id="XMLID_1355_" class="st7" d="M46.4 52v-2c0-7.9-6.5-14.4-14.4-14.4S17.6 42.1 17.6 50v2h28.8z"/><path id="XMLID_1368_" class="st19" d="M25.1 46.8V52"/><path id="XMLID_1367_" class="st19" d="M39.7 46.8V52"/><path id="XMLID_193_" class="st16" d="M21.9 30.6h-.5c-.7 0-1.2-.5-1.2-1.2v-1.9c0-.7.5-1.2 1.2-1.2h.5v4.3z"/><path id="XMLID_192_" class="st16" d="M41.3 30.6h.5c.7 0 1.2-.5 1.2-1.2v-1.9c0-.7-.5-1.2-1.2-1.2h-.5v4.3z"/><path id="XMLID_191_" class="st23" d="M21.9 30.6h-.5c-.7 0-1.2-.5-1.2-1.2v-1.9c0-.7.5-1.2 1.2-1.2h.5v4.3z"/><path id="XMLID_190_" class="st23" d="M41.3 30.6h.5c.7 0 1.2-.5 1.2-1.2v-1.9c0-.7-.5-1.2-1.2-1.2h-.5v4.3z"/><path id="XMLID_189_" class="st16" d="M21.9 22.6v8.2c0 5.3 4.3 9.7 9.7 9.7 5.3 0 9.7-4.3 9.7-9.7V23c-1.1-6.8-7.3-8.8-10.3-8.7-2.8.1-8.1 3-9.1 8.3z"/><path id="XMLID_188_" class="st17" d="M41.3 25.5s-4.9-5.8-13-6.7L22 25.7s-1.6-10 9.3-11.4c-.1 0 10.1-.3 10 11.2z"/><path id="XMLID_187_" class="st19" d="M21.9 25.7s4-2.3 6.3-6.9c0 0 9.8 1.7 13 6.7"/><path id="XMLID_186_" class="st19" d="M41.3 24c0-5.3-4.3-9.7-9.7-9.7-5.3 0-9.7 4.3-9.7 9.7v6.7c0 5.3 4.3 9.7 9.7 9.7 5.3 0 9.7-4.3 9.7-9.7V24z"/><path id="XMLID_185_" class="st17" d="M40.8 12s-6.8 6.8-12.9 3.8c0 0-1.5 5.8 6.8 5.2-.1.1 8.4-.2 6.1-9z"/><path id="XMLID_184_" class="st23" d="M27.9 17.8c.3 1.6 1.8 3.6 6.8 3.3 0 0 8.5-.2 6.1-9 0 0-2.5 2.4-5.7 3.8"/></g></svg> -->
+                                <p style="font-size: 14px;">Samson</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-g">
+                    <div class="main-wrapper create">
+                        <div class="flexs">
+                            <a href="/new/ticket" style="text-decoration: none;">
+                                <div class="create-button but flexs">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <button style="color: white;">Create Ticket</button>
+                                </div>
+                            </a>
+                            <a href="" style="text-decoration: none;">
+                                <div class="other-button but flexs">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
+                                    </svg>
+                                    <button>My Tickets</button>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="main-wrapper">
+                <nav class="flexs">
+                    <div class="home flexs">
+                        <a href="/my" style="text-decoration: none; color: ;"><svg style="margin-right: 9px;" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                        </svg></a>
+                        <p>/</p>
+                        <p style="margin-left: 9px; font-size: 15px;">Tickets</p>
+                    </div>
+                    <div>
+                        <div class="dropdown">
+                            <span>Sort by</span>
+                            <div class="dropdown-content">
+                                <a href="#">Newest</a>
+                                <a href="#">Oldest</a>
+                            </div>
+                        </div>
+
+                        <div class="dropdown">
+                            <span>Filter by</span>
+                            <div class="dropdown-content">
+                                <a href="#">All</a>
+                                <a href="#">Few</a>
+                            </div>
+                        </div>
+
+                        <div class="dropdown">
+                            <span>Group by</span>
+                            <div class="dropdown-content">
+                                <a href="#">Name</a>
+                                <a href="#">Class</a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <div>
+                <div class="main-wrapper">
+                    <t t-if="grouped_tickets">
+                        <t t-call="portal.portal_table">
+                            <t t-foreach="grouped_tickets" t-as="tickets">
+                                <thead>
+                                    <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
+                                        <th class="text-left">By</th>
+                                        <th class="text-left">Number</th>
+                                        <th t-if="groupby == 'none'">Title</th>
+                                        <th t-if="groupby == 'category'">
+                                            <em class="font-weight-normal text-muted">Tickets in category:</em>
+                                            <span class="text-truncate" t-field="tickets[0].sudo().category_id.name" />
+                                        </th>
+                                        <th t-if="groupby == 'stage'">
+                                            <em class="font-weight-normal text-muted">Tickets in stage:</em>
+                                            <span class="text-truncate" t-field="tickets[0].sudo().stage_id.name" />
+                                        </th>
+                                        <th t-if="groupby != 'category'">Category</th>
+                                        <th t-if="groupby != 'stage'">Stage</th>
+                                        <th>Created Date</th>
+                                        <th>Last Stage Update</th>
+                                        <th>Close Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="tickets" t-as="ticket">
+                                        <tr>
+                                            <td class="text-left">
+                                                <span t-esc="ticket.partner_id.name" />
+                                            </td>
+                                            <td class="text-left">
+                                                <span t-esc="ticket.number" />
+                                            </td>
+                                            <td>
+                                                <a t-attf-href="/my/ticket/#{ticket.id}?{{ keep_query() }}">
+                                                    <span t-field="ticket.name" />
+                                                </a>
+                                            </td>
+                                            <td t-if="groupby != 'category'">
+                                                <span t-esc="ticket.category_id.name" />
+                                            </td>
+                                            <td t-if="groupby != 'stage'">
+                                                <span class="badge badge-pill badge-info"
+                                                    title="Current stage of the ticket" t-esc="ticket.stage_id.name" />
+                                            </td>
+                                            <td>
+                                                <span t-options='{"widget": "date"}' t-field="ticket.create_date" />
+                                            </td>
+                                            <td>
+                                                <span t-field="ticket.last_stage_update" />
+                                            </td>
+                                            <td>
+                                                <span t-options='{"widget": "date"}' t-field="ticket.closed_date" />
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </t>
+                        </t>
+                    </t>
+                </div>
+            </div>
+        </div>
+        <!-- <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tickets</t>
+            </t>
+
+            <form method="POST" t-attf-action="/new/ticket">
+                <button
+                    name="create_new_ticket"
+                    type="action"
+                    class="btn btn-primary"
+                    style="float: right; margin-right: 0px; margin-bottom: 5px;"
+                >New Ticket</button>
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    t-att-value="request.csrf_token()"
+                />
+            </form>
+
+            <t t-if="not grouped_tickets">
+                <div class="alert alert-warning mt8" role="alert">
+                    <p>No tickets found.</p>
+                </div>
+            </t>
+            <t t-call="helpdesk_mgmt.portal_ticket_list" />
+        </t> -->
+    </template>
+
+    <template id="portal_ticket_list" name="Ticket List">
+
+    </template>
+
+    <!-- <template id="portal_ticket_list" name="Ticket List">
+        <t t-if="grouped_tickets">
+            <t t-call="portal.portal_table">
+                <t t-foreach="grouped_tickets" t-as="tickets">
+                    <thead>
+                        <tr
+                            t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}"
+                        >
+                            <th class="text-left">By</th>
+                            <th class="text-left">Number</th>
+                            <th t-if="groupby == 'none'">Title</th>
+                            <th t-if="groupby == 'category'">
+                                <em
+                                    class="font-weight-normal text-muted"
+                                >Tickets in category:</em>
+                                <span
+                                    class="text-truncate"
+                                    t-field="tickets[0].sudo().category_id.name"
+                                />
+                            </th>
+                            <th t-if="groupby == 'stage'">
+                                <em
+                                    class="font-weight-normal text-muted"
+                                >Tickets in stage:</em>
+                                <span
+                                    class="text-truncate"
+                                    t-field="tickets[0].sudo().stage_id.name"
+                                />
+                            </th>
+                            <th t-if="groupby != 'category'">Category</th>
+                            <th t-if="groupby != 'stage'">Stage</th>
+                            <th>Create Date</th>
+                            <th>Last Stage Update</th>
+                            <th>Close Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="tickets" t-as="ticket">
+                            <tr>
+                                <td class="text-left">
+                                    <span t-esc="ticket.partner_id.name" />
+                                </td>
+                                <td class="text-left">
+                                    <span t-esc="ticket.number" />
+                                </td>
+                                <td>
+                                    <a
+                                        t-attf-href="/my/ticket/#{ticket.id}?{{ keep_query() }}"
+                                    >
+                                        <span t-field="ticket.name" />
+                                    </a>
+                                </td>
+                                <td t-if="groupby != 'category'">
+                                    <span t-esc="ticket.category_id.name" />
+                                </td>
+                                <td t-if="groupby != 'stage'">
+                                    <span
+                                        class="badge badge-pill badge-info"
+                                        title="Current stage of the ticket"
+                                        t-esc="ticket.stage_id.name"
+                                    />
+                                </td>
+                                <td>
+                                    <span t-field="ticket.create_date" />
+                                </td>
+                                <td>
+                                    <span t-field="ticket.last_stage_update" />
+                                </td>
+                                <td>
+                                    <span t-field="ticket.closed_date" />
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </t>
+            </t>
+        </t>
+    </template> -->
+
+    <template id="portal_helpdesk_ticket_page" name="Ticket Portal Template">
+    <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/helpdesk_mgmt/static/src/css/mysheet.css" />
+        </xpath>
+        <title t-field="ticket.name" />
+
+        <div class="body">
+        <div class="nav">
+            <div class="border-g">
+                <div class="main-wrapper navbar flexs">
+                    <div class="flexs">
+                        <!-- <div>
+                            <img t-att-src="'/helpdesk_mgmt/static/img/logo.jpg'" alt="My Image" />
+                        </div> -->
+                        <div>
+                            <p class="logo"><span style="color: rgba(240,191,99,1);">HELP</span>DESK</p>
+                        </div>
+                        <!-- <div class="search_menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                            </svg>
+                            <input type="text" name="" id="" placeholder="Type here to search" />
+                        </div> -->
+                    </div>
+                    <div class="flexs">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                                </svg>
+                                
+                        </div>
+                        <div>
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                                </svg>                                  
+                        </div>
+                        <div class="flexs">
+                            <!-- <svg style="width: 40px;" version="1.1" id="icons" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 64 64" style="enable-background:new 0 0 64 64" xml:space="preserve"><style>.st0{display:none}.st1{fill:#36d7b7}.st1,.st2,.st3{display:inline}.st2{fill:none;stroke:#414042;stroke-miterlimit:10}.st3{fill:#f5ab35}.st4{fill:#f7bc5d}.st4,.st5{display:inline}.st6{fill:#414042}.st7{fill:#36d7b7}.st10,.st9{display:inline;fill:#f1f2f2}.st10{fill:none;stroke:#414042;stroke-linecap:round;stroke-miterlimit:10}.st11,.st12{display:inline;fill:#414042}.st12{fill:#e6e7e8}.st14{fill:#d1d3d4}.st14,.st15{display:inline}.st15,.st16{fill:#fff}.st17{fill:#f5ab35}.st18{fill:#f9cd86}.st19{fill:none;stroke:#414042;stroke-miterlimit:10}.st20{fill:#29a189}.st21{fill:#f7bc5d}.st22{display:inline;fill:#29a189}.st23{fill:none;stroke:#414042;stroke-linecap:round;stroke-miterlimit:10}.st24{fill:#e6e7e8}.st27{fill:#5edfc5}.st28,.st29{fill:none;stroke-miterlimit:10}.st28{display:inline;stroke:#414042;stroke-dasharray:1}.st29{stroke:#36d7b7}.st32{display:inline;fill:#bcbec0}.st33{fill:none;stroke:#f5ab35;stroke-miterlimit:10}.st33,.st34,.st35{display:inline}.st34{fill:none;stroke:#36d7b7;stroke-miterlimit:10}.st35{fill:#5edfc5}.st38{fill:none;stroke:#fff;stroke-miterlimit:10}.st39,.st42{display:inline}.st39{fill:none;stroke:#fff;stroke-miterlimit:10}.st42{fill:#86e7d4}</style><g id="XMLID_175_"><path id="XMLID_1355_" class="st7" d="M46.4 52v-2c0-7.9-6.5-14.4-14.4-14.4S17.6 42.1 17.6 50v2h28.8z"/><path id="XMLID_1368_" class="st19" d="M25.1 46.8V52"/><path id="XMLID_1367_" class="st19" d="M39.7 46.8V52"/><path id="XMLID_193_" class="st16" d="M21.9 30.6h-.5c-.7 0-1.2-.5-1.2-1.2v-1.9c0-.7.5-1.2 1.2-1.2h.5v4.3z"/><path id="XMLID_192_" class="st16" d="M41.3 30.6h.5c.7 0 1.2-.5 1.2-1.2v-1.9c0-.7-.5-1.2-1.2-1.2h-.5v4.3z"/><path id="XMLID_191_" class="st23" d="M21.9 30.6h-.5c-.7 0-1.2-.5-1.2-1.2v-1.9c0-.7.5-1.2 1.2-1.2h.5v4.3z"/><path id="XMLID_190_" class="st23" d="M41.3 30.6h.5c.7 0 1.2-.5 1.2-1.2v-1.9c0-.7-.5-1.2-1.2-1.2h-.5v4.3z"/><path id="XMLID_189_" class="st16" d="M21.9 22.6v8.2c0 5.3 4.3 9.7 9.7 9.7 5.3 0 9.7-4.3 9.7-9.7V23c-1.1-6.8-7.3-8.8-10.3-8.7-2.8.1-8.1 3-9.1 8.3z"/><path id="XMLID_188_" class="st17" d="M41.3 25.5s-4.9-5.8-13-6.7L22 25.7s-1.6-10 9.3-11.4c-.1 0 10.1-.3 10 11.2z"/><path id="XMLID_187_" class="st19" d="M21.9 25.7s4-2.3 6.3-6.9c0 0 9.8 1.7 13 6.7"/><path id="XMLID_186_" class="st19" d="M41.3 24c0-5.3-4.3-9.7-9.7-9.7-5.3 0-9.7 4.3-9.7 9.7v6.7c0 5.3 4.3 9.7 9.7 9.7 5.3 0 9.7-4.3 9.7-9.7V24z"/><path id="XMLID_185_" class="st17" d="M40.8 12s-6.8 6.8-12.9 3.8c0 0-1.5 5.8 6.8 5.2-.1.1 8.4-.2 6.1-9z"/><path id="XMLID_184_" class="st23" d="M27.9 17.8c.3 1.6 1.8 3.6 6.8 3.3 0 0 8.5-.2 6.1-9 0 0-2.5 2.4-5.7 3.8"/></g></svg> -->
+                            <p style="font-size: 14px;">Samson</p> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main-wrapper">
+            <nav class="flexs">
+                <div class="home flexs">
+                    <a href="/my" style="text-decoration: none; color: ;"><svg style="margin-right: 9px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg></a>
+                    <p>/</p>
+                    <a href="/my/tickets" style="text-decoration: none; color: ;"><p style="margin-left: 9px; font-size: 15px;">Tickets</p></a> 
+                    <p style="margin-left: 9px; ">/</p>
+                    <p style="margin-left: 9px; font-size: 15px;" t-field="ticket.name" />    
+                </div>
+            </nav>
+        </div>
+        <div class="main-wrapper">
+            <div class="ticket-details">
+                <div class="title">
+                    <h2><span t-field="ticket.name" /> <span t-field="ticket.number" style="background-color: rgb(40, 39, 37); font-size: 20px; padding: 4px 5px; border-radius: 3px; color: white;"></span></h2>
+                    
+                    <p t-if="ticket.stage_id.name == 'Done'">Stage: <span class="done" t-field="ticket.stage_id.name"></span></p>
+                    <p t-if="ticket.stage_id.name == 'Awaiting'">Stage: <span class="awaiting" t-field="ticket.stage_id.name"></span></p>
+                    <p t-if="ticket.stage_id.name == 'New'">Stage: <span class="new" t-field="ticket.stage_id.name"></span></p>
+                    <p t-if="ticket.stage_id.name == 'In Progress'">Stage: <span class="inprogress" t-field="ticket.stage_id.name"></span></p>
+                    <p t-if="ticket.stage_id.name == 'Rejected'">Stage: <span class="rejected" t-field="ticket.stage_id.name"></span></p>
+                    <p t-if="ticket.stage_id.name == 'Cancelled'">Stage: <span class="cancelled" t-field="ticket.stage_id.name"></span></p>
+                </div>
+                <div class="details">
+                    <div class="date">
+                        <p><span class="bold">Date:</span> <span t-options='{"widget": "datetime"}' t-field="ticket.create_date" /></p>
+                        <p><span class="bold">Category:</span> <span t-field="ticket.category_id" /></p>
+                        <p><span class="bold">Last stage update:</span> <span t-field="ticket.last_stage_update" /></p>
+                        <div t-if="ticket.closed_date">
+                            <p><span class="bold">Close Date:</span><span t-field="ticket.closed_date" t-options='{"widget": "datetime"}' /></p>
+                        </div>
+                        <div style="margin-top: 5px;" t-if="not ticket.closed_date" name="ticket_close_buttons">
+                            <t t-foreach="closed_stages" t-as="stage">
+                                <form method="GET" t-attf-action="/ticket/close" style="display:inline;">
+                                    <input style="" type="hidden" name="ticket_id" t-attf-value="#{ticket.id}" />
+                                    <input type="hidden" name="stage_id" t-attf-value="#{stage.id}" />
+                                    <button class="" style="font-size: small; padding: 4px;">
+                                        <span t-field="stage.name" />
+                                    </button>
+                                </form>
+                            </t>
+                        </div>
+                    </div>
+                    <div>
+                    <div style="justify-content: space-between; align-items: center;" class="col-12 col-md-6 pb-2" t-if="ticket.user_id">
+                            <strong>Assignee</strong>
+                            <div class="row">
+                                <div class="col d-flex align-items-center flex-grow-0 pr-3">
+                                    <img class="rounded-circle mt-1 o_portal_contact_img"
+                                        t-att-src="image_data_uri(ticket.user_id.avatar_1024)" alt="Contact" />
+                                </div>
+                                <div class="col pl-md-0">
+                                    <div t-esc="ticket.user_id" t-options='{"widget": "contact", "fields": ["name"]}' />
+                                    <a t-attf-href="mailto:{{ticket.user_id.email}}" t-if="ticket.user_id.email">
+                                        <div t-esc="ticket.user_id" t-options='{"widget": "contact", "fields": ["email"]}' />
+                                    </a>
+                                    <a t-attf-href="tel:{{ticket.user_id.phone}}" t-if="ticket.user_id.phone">
+                                        <div t-esc="ticket.user_id" t-options='{"widget": "contact", "fields": ["phone"]}' />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="customer">
+                            <h3>Customer</h3>
+                            <div class="image">
+                                <img t-att-src="image_data_uri(ticket.partner_id.avatar_1024)" alt="Contact"/>
+                                <div>
+                                    <p t-field="ticket.partner_id" t-options='{"widget": "contact", "fields": ["name"]}' />
+                                    <div class="flexs">
+                                        <svg style="width: 20px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                        </svg>
+                                        <a t-attf-href="mailto:{{ticket.partner_id.email}}" t-if="ticket.partner_id.email" style="margin-top: 3px; margin-left: 4px; text-decoration: none;"><p t-field="ticket.partner_id" t-options='{"widget": "contact", "fields": ["email"]}' /></a>
+                                        <a t-attf-href="tel:{{ticket.partner_id.phone}}" t-if="ticket.partner_id.phone">
+                                            <p t-field="ticket.partner_id" t-options='{"widget": "contact", "fields": ["phone"]}' />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div t-if="ticket.description or ticket.attachment_ids">
+                    <div class="description-details">
+                        <div t-if="ticket.description" >
+                            <p class="" style="font-weight: bold;">Description</p>
+                            <div style="font-size: 13px; line-height: 24px;">
+                                <p class="" style="margin-top: 10px;" t-field="ticket.description"/>
+                            </div>
+                        </div>
+                        <div t-if="ticket.attachment_ids">
+                            <p style="margin-bottom: 10px;font-weight: bold;">Attachment</p>
+                            <div class="row" style="font-size: 12px;">
+                    <div t-attf-class="col {{'col-lg-6' if not ticket.description else 'col-lg-12'}}">
+                    <ul class="list-group">
+                        <a class="list-group-item list-group-item-action d-flex align-items-center oe_attachments py-1 px-2"
+                            t-foreach='ticket.attachment_ids' t-as='attachment'
+                            t-attf-href="/web/content/#{attachment.id}?download=true&amp;access_token=#{attachment.access_token}"
+                            target="_blank" data-no-post-process="">
+                            <div class='oe_attachment_embedded o_image o_image_small mr-2 mr-lg-3'
+                                t-att-title="attachment.name" t-att-data-mimetype="attachment.mimetype"
+                                t-attf-data-src="/web/image/#{attachment.id}/50x40?access_token=#{attachment.access_token}" />
+                            <div class='oe_attachment_name text-truncate'>
+                                <t t-esc='attachment.name' />
+                            </div>
+                    </a>
+                </ul>
+            </div>
+        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="main-wrapper">
+            <div class="message">
+                <h3>Message and Communication History</h3>
+                <t t-call="portal.message_thread">
+                    <t t-set="object" t-value="ticket" />
+                    <t t-set="token" t-value="ticket.access_token" />
+                    <t t-set="pid" t-value="pid" />
+                    <t t-set="hash" t-value="hash" />
+                </t>
+                <div class="flexs" style="margin-top: 10px;"><svg style="width: 23px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                  </svg>
+                  <p style="margin-left: 3px;">2 Comments</p>
+                </div>
+                <div class="flexs" style="margin-top: 20px;">
+                    <img t-att-src="image_data_uri(ticket.partner_id.avatar_1024)" alt="Contact"/>
+                    <div style="width: 100%; margin-left: 20px;">
+                        <textarea style="width: 100%;" name="" id="" cols="30" rows="10"></textarea>
+                        <div class="flexs">
+                            <button style="background-color: rgb(220, 191, 99); border-radius: 4px; color: white; padding: 10px 19px; ">Send</button>
+                            <button style=" border-radius: 4px; background-color: #414042; color: white; padding: 5px 10px;"><svg style="width: 20px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                              </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chats">
+                <div style="display:flex;">
+                    <img width="60px" src="avatar.svg" alt=""/>
+                    <div class="chat-messages" style="margin: 28px 0px 0px 6px;">
+                        <h4 >Samson Oke</h4>
+                        <p style="font-size: 12px; margin: 5px 0px;">Published on August 14th 2023, 5:03pm</p>
+                        <p style="font-size: 14px; width: 80%; line-height: 20px;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat nisi ut pariatur aperiam enim eligendi cum reprehenderit, nihil, in dolor iusto officia distinctio quo est quaerat. Reprehenderit tenetur similique dolorem.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="chats">
+                <div style="display:flex;">
+                    <img width="60px" src="avatar.svg" alt=""/>
+                    <div class="chat-messages" style="margin: 28px 0px 0px 6px;">
+                        <h4 >Samson Oke</h4>
+                        <p style="font-size: 12px; margin: 5px 0px;">Published on August 14th 2023, 5:03pm</p>
+                        <p style="font-size: 14px; width: 80%; line-height: 20px;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat nisi ut pariatur aperiam enim eligendi cum reprehenderit, nihil, in dolor iusto officia distinctio quo est quaerat. Reprehenderit tenetur similique dolorem.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="chats">
+                <div style="display:flex;">
+                    <img width="60px" src="avatar.svg" alt=""/>
+                    <div class="chat-messages" style="margin: 28px 0px 0px 6px;">
+                        <h4 >Samson Oke</h4>
+                        <p style="font-size: 12px; margin: 5px 0px;">Published on August 14th 2023, 5:03pm</p>
+                        <p style="font-size: 14px; width: 80%; line-height: 20px;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat nisi ut pariatur aperiam enim eligendi cum reprehenderit, nihil, in dolor iusto officia distinctio quo est quaerat. Reprehenderit tenetur similique dolorem.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="overlay" id="overlay">
+        <div class="modal" id="modal">
+            <span class="close-button" id="close-button">X</span>
+            <div class="feedback-form">
+                <h1>Customer Feedback</h1>
+                <form>
+                    <label for="">How satisfied are you with the support received?</label>
+                    <select id="" name="" required="true">
+                        <option value="satisfied">Satisfied</option>
+                        <option value="somewhatSatisfied">Somewhat Satisfied</option>
+                        <option value="dissatisfied">Dissatisfied</option>
+                    </select>
+
+                    <label for="">Rate the quality of the service rendered</label>
+                    <select id="" name="" required="true">
+                        <option value="excellent">Excellent</option>
+                        <option value="good">Good</option>
+                        <option value="neutral">Neutral</option>
+                        <option value="bad">Bad</option>
+                    </select>
+
+                    <label for="">3. Rate the support agent</label>
+                    <select id="" name="" required="true">
+                        <option value="excellent">Excellent</option>
+                        <option value="good">Good</option>
+                        <option value="bad">Bad</option>
+                    </select>
+
+                    <label for="">Any feedback or comment?</label>
+                    <textarea id="" name=""></textarea>
+                    <button type="submit">Submit Feedback</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <button id="open-modal">Open Feedback Form</button>
+    <xpath>
+        <script>
+        const openModalButton = document.getElementById('open-modal');
+        const modal = document.getElementById('modal');
+        const overlay = document.getElementById('overlay');
+        const closeButton = document.getElementById('close-button');
+
+        openModalButton.addEventListener('click', () => {
+            modal.style.display = 'block';
+            overlay.style.display = 'flex';
+        });
+
+        closeButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+    </script>
+    </xpath>
+        <!-- <t t-call="portal.portal_layout">
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <div class="row no-gutters">
+                        <div class="col-12">
+                            <h5 class="d-flex mb-1 mb-md-0 row">
+                                <div class="col-9">
+                                    <span t-field="ticket.name" class="text-truncate" />
+                                    <small class="text-muted d-none d-md-inline"> ( <span t-field="ticket.number" />
+                                        )</small>
+                                </div>
+                                <div class="col-3 text-right">
+                                    <small class="text-right">Stage:</small>
+                                    <span t-field="ticket.stage_id.name" class=" badge badge-pill bg-info"
+                                        title="Current stage of this ticket" />
+                                </div>
+                            </h5>
+                        </div>
+                    </div>
+                </t>
+
+                <t t-set="card_body">
+                    <div class="row mb-4">
+                        <div class="col-12 col-md-6" name="portal_ticket_col_0">
+                            <div>
+                                <strong>Date:</strong>
+                                <span t-field="ticket.create_date" t-options='{"widget": "datetime"}' />
+                            </div>
+                            <div><strong>Category:</strong><span t-field="ticket.category_id" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 text-right" name="portal_ticket_col_1">
+                            <div>
+                                <strong>Last Stage Update:</strong>
+                                <span t-field="ticket.last_stage_update" t-options='{"widget": "datetime"}' />
+                            </div>
+                            <div t-if="ticket.closed_date">
+                                <strong>Close Date:</strong>
+                                <span t-field="ticket.closed_date" t-options='{"widget": "datetime"}' />
+                            </div>
+                            <div t-if="not ticket.closed_date" name="ticket_close_buttons">
+                                <t t-foreach="closed_stages" t-as="stage">
+                                    <form method="GET" t-attf-action="/ticket/close" style="display:inline;">
+                                        <input type="hidden" name="ticket_id" t-attf-value="#{ticket.id}" />
+                                        <input type="hidden" name="stage_id" t-attf-value="#{stage.id}" />
+                                        <button class="btn btn-outline-primary" style="font-size: small; padding: 4px;">
+                                            <span t-field="stage.name" />
+                                        </button>
+                                    </form>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3" t-if="ticket.user_id or ticket.partner_id">
+                        <div class="col-12 col-md-6 pb-2" t-if="ticket.user_id">
+                            <strong>Assignee</strong>
+                            <div class="row">
+                                <div class="col d-flex align-items-center flex-grow-0 pr-3">
+                                    <img class="rounded-circle mt-1 o_portal_contact_img"
+                                        t-att-src="image_data_uri(ticket.user_id.avatar_1024)" alt="Contact" />
+                                </div>
+                                <div class="col pl-md-0">
+                                    <div t-esc="ticket.user_id" t-options='{"widget": "contact", "fields": ["name"]}' />
+                                    <a t-attf-href="mailto:{{ticket.user_id.email}}" t-if="ticket.user_id.email">
+                                        <div t-esc="ticket.user_id"
+                                            t-options='{"widget": "contact", "fields": ["email"]}' />
+                                    </a>
+                                    <a t-attf-href="tel:{{ticket.user_id.phone}}" t-if="ticket.user_id.phone">
+                                        <div t-esc="ticket.user_id"
+                                            t-options='{"widget": "contact", "fields": ["phone"]}' />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 pb-2" t-if="ticket.partner_id">
+                            <strong>Customer</strong>
+                            <div class="row">
+                                <div class="col d-flex align-items-center flex-grow-0 pr-3">
+                                    <img class="rounded-circle mt-1 o_portal_contact_img"
+                                        t-att-src="image_data_uri(ticket.partner_id.avatar_1024)" alt="Contact" />
+                                </div>
+                                <div class="col pl-md-0">
+                                    <div t-field="ticket.partner_id"
+                                        t-options='{"widget": "contact", "fields": ["name"]}' />
+                                    <a t-attf-href="mailto:{{ticket.partner_id.email}}" t-if="ticket.partner_id.email">
+                                        <div t-field="ticket.partner_id"
+                                            t-options='{"widget": "contact", "fields": ["email"]}' />
+                                    </a>
+                                    <a t-attf-href="tel:{{ticket.partner_id.phone}}" t-if="ticket.partner_id.phone">
+                                        <div t-field="ticket.partner_id"
+                                            t-options='{"widget": "contact", "fields": ["phone"]}' />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" t-if="ticket.description or ticket.attachment_ids">
+                        <div t-if="ticket.description"
+                            t-attf-class="col-12 col-lg-7 mb-4 mb-md-0 {{'col-lg-7' if ticket.attachment_ids else 'col-lg-12'}}">
+                            <hr class="mb-1" />
+                            <div class="d-flex my-2">
+                                <strong>Description</strong>
+                            </div>
+                            <div class="py-1 px-2 bg-100 small" t-field="ticket.description" />
+                        </div>
+                        <div t-if="ticket.attachment_ids"
+                            t-attf-class="col-12 col-lg-5 o_project_portal_attachments {{'col-lg-5' if ticket.description else 'col-lg-12'}}">
+                            <hr class="mb-1 d-none d-lg-block" />
+                            <strong class="d-block mb-2">Attachments</strong>
+                            <div class="row">
+                                <div t-attf-class="col {{'col-lg-6' if not ticket.description else 'col-lg-12'}}">
+                                    <ul class="list-group">
+                                        <a class="list-group-item list-group-item-action d-flex align-items-center oe_attachments py-1 px-2"
+                                            t-foreach='ticket.attachment_ids' t-as='attachment'
+                                            t-attf-href="/web/content/#{attachment.id}?download=true&amp;access_token=#{attachment.access_token}"
+                                            target="_blank" data-no-post-process="">
+                                            <div class='oe_attachment_embedded o_image o_image_small mr-2 mr-lg-3'
+                                                t-att-title="attachment.name" t-att-data-mimetype="attachment.mimetype"
+                                                t-attf-data-src="/web/image/#{attachment.id}/50x40?access_token=#{attachment.access_token}" />
+                                            <div class='oe_attachment_name text-truncate'>
+                                                <t t-esc='attachment.name' />
+                                            </div>
+                                        </a>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+
+            <div class="mt32">
+                <h4>
+                    <strong>Message and communication history</strong>
+                </h4>
+                <t t-call="portal.message_thread">
+                    <t t-set="object" t-value="ticket" />
+                    <t t-set="token" t-value="ticket.access_token" />
+                    <t t-set="pid" t-value="pid" />
+                    <t t-set="hash" t-value="hash" />
+                </t>
+            </div>
+        </t> -->
+    </template>
+
+
+
+
+    <template id="portal_create_ticket" name="Create Ticket">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/helpdesk_mgmt/static/src/css/mysheet.css" />
+        </xpath>
+        <title>Create Ticket</title>
+
+        <div class="body">
+            <div class="">
+                <div class="nav">
+                    <div class="border-g">
+                        <div class="main-wrapper navbar flexs">
+                            <div class="flexs">
+                                <!-- <div>
+                                    <img t-att-src="'/helpdesk_mgmt/static/img/logo.jpg'" alt="My Image" />
+                                </div> -->
+                                <div>
+                                    <p class="logo"><span style="color: rgba(240,191,99,1);">HELP</span>DESK</p>
+                                </div>
+                                <!-- <div class="search_menu">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                    </svg>
+                                    <input type="text" name="" id="" placeholder="Type here to search"></input>
+                                </div> -->
+                            </div>
+                            <div class="flexs">
+                                <div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                                    </svg>
+
+                                </div>
+                                <div>
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                                    </svg>
+                                </div>
+                                <div class="flexs">
+                                    <!-- <svg style="width: 40px;" version="1.1" id="icons" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 64 64" style="enable-background:new 0 0 64 64" xml:space="preserve"><style>.st0{display:none}.st1{fill:#36d7b7}.st1,.st2,.st3{display:inline}.st2{fill:none;stroke:#414042;stroke-miterlimit:10}.st3{fill:#f5ab35}.st4{fill:#f7bc5d}.st4,.st5{display:inline}.st6{fill:#414042}.st7{fill:#36d7b7}.st10,.st9{display:inline;fill:#f1f2f2}.st10{fill:none;stroke:#414042;stroke-linecap:round;stroke-miterlimit:10}.st11,.st12{display:inline;fill:#414042}.st12{fill:#e6e7e8}.st14{fill:#d1d3d4}.st14,.st15{display:inline}.st15,.st16{fill:#fff}.st17{fill:#f5ab35}.st18{fill:#f9cd86}.st19{fill:none;stroke:#414042;stroke-miterlimit:10}.st20{fill:#29a189}.st21{fill:#f7bc5d}.st22{display:inline;fill:#29a189}.st23{fill:none;stroke:#414042;stroke-linecap:round;stroke-miterlimit:10}.st24{fill:#e6e7e8}.st27{fill:#5edfc5}.st28,.st29{fill:none;stroke-miterlimit:10}.st28{display:inline;stroke:#414042;stroke-dasharray:1}.st29{stroke:#36d7b7}.st32{display:inline;fill:#bcbec0}.st33{fill:none;stroke:#f5ab35;stroke-miterlimit:10}.st33,.st34,.st35{display:inline}.st34{fill:none;stroke:#36d7b7;stroke-miterlimit:10}.st35{fill:#5edfc5}.st38{fill:none;stroke:#fff;stroke-miterlimit:10}.st39,.st42{display:inline}.st39{fill:none;stroke:#fff;stroke-miterlimit:10}.st42{fill:#86e7d4}</style><g id="XMLID_175_"><path id="XMLID_1355_" class="st7" d="M46.4 52v-2c0-7.9-6.5-14.4-14.4-14.4S17.6 42.1 17.6 50v2h28.8z"/><path id="XMLID_1368_" class="st19" d="M25.1 46.8V52"/><path id="XMLID_1367_" class="st19" d="M39.7 46.8V52"/><path id="XMLID_193_" class="st16" d="M21.9 30.6h-.5c-.7 0-1.2-.5-1.2-1.2v-1.9c0-.7.5-1.2 1.2-1.2h.5v4.3z"/><path id="XMLID_192_" class="st16" d="M41.3 30.6h.5c.7 0 1.2-.5 1.2-1.2v-1.9c0-.7-.5-1.2-1.2-1.2h-.5v4.3z"/><path id="XMLID_191_" class="st23" d="M21.9 30.6h-.5c-.7 0-1.2-.5-1.2-1.2v-1.9c0-.7.5-1.2 1.2-1.2h.5v4.3z"/><path id="XMLID_190_" class="st23" d="M41.3 30.6h.5c.7 0 1.2-.5 1.2-1.2v-1.9c0-.7-.5-1.2-1.2-1.2h-.5v4.3z"/><path id="XMLID_189_" class="st16" d="M21.9 22.6v8.2c0 5.3 4.3 9.7 9.7 9.7 5.3 0 9.7-4.3 9.7-9.7V23c-1.1-6.8-7.3-8.8-10.3-8.7-2.8.1-8.1 3-9.1 8.3z"/><path id="XMLID_188_" class="st17" d="M41.3 25.5s-4.9-5.8-13-6.7L22 25.7s-1.6-10 9.3-11.4c-.1 0 10.1-.3 10 11.2z"/><path id="XMLID_187_" class="st19" d="M21.9 25.7s4-2.3 6.3-6.9c0 0 9.8 1.7 13 6.7"/><path id="XMLID_186_" class="st19" d="M41.3 24c0-5.3-4.3-9.7-9.7-9.7-5.3 0-9.7 4.3-9.7 9.7v6.7c0 5.3 4.3 9.7 9.7 9.7 5.3 0 9.7-4.3 9.7-9.7V24z"/><path id="XMLID_185_" class="st17" d="M40.8 12s-6.8 6.8-12.9 3.8c0 0-1.5 5.8 6.8 5.2-.1.1 8.4-.2 6.1-9z"/><path id="XMLID_184_" class="st23" d="M27.9 17.8c.3 1.6 1.8 3.6 6.8 3.3 0 0 8.5-.2 6.1-9 0 0-2.5 2.4-5.7 3.8"/></g></svg> -->
+                                    <p style="font-size: 14px;">Samson</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-wrapper">
+                    <nav class="flexs">
+                        <div class="home flexs">
+                            <a href="/my" style="text-decoration: none; color: ;"><svg style="margin-right: 9px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                            </svg></a>
+                            <p>/</p>
+                            <p style="margin-left: 9px; font-size: 15px;">Create New Ticket</p>    
+                        </div>
+                    </nav>
+                </div>
+                <div>
+                    <form action="/submitted/ticket" method="POST" class="form-horizontal mt32"
+                        enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                        <div class="form">
+                            <div class="title">
+                                <h2>Send a new ticket</h2>
+                            </div>
+                            <div>
+                                <p>Category</p>
+                                <select id="category" name="category" required="True">
+                                    <t t-foreach="categories" t-as="cat">
+                                        <option t-attf-value="#{cat.id}">
+                                            <t t-esc="cat.name" />
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div>
+                                <p>Issues</p>
+                                <input type="text" name="" id=""></input>
+                            </div>
+                            <div>
+                                <p>Subject</p>
+                                <input type="text" name="subject" required="True"></input>
+                            </div>
+                            <div>
+                                <p>Add Attachment</p>
+                                <!-- <label for="file-input" class="custom-label">
+                                    <span class="icon">📁</span> Choose a file
+                                </label> -->
+                                <input name="attachment" id="attachment" type="file" multiple="multiple"/>
+                                <xpath expr="." position="inside">
+                                    <script type="text/javascript"
+                                        src="/helpdesk_mgmt/static/src/js/scriptss.js"></script>
+                                </xpath>
+                            </div>
+
+                            <div>
+                                <p>Description</p>
+                                <textarea name="description" type="text" required="True" id=""></textarea>
+                            </div>
+                            <button>Send Ticket</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </template>
+</odoo>
